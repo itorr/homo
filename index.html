@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html id="容器">
+<head>
+	<meta charset="UTF-8">
+	<title>恶臭数字论证器 - 神奇海螺</title>
+	<meta name="viewport" content="width=device-width,user-scalable=0">
+	<style>
+		html{
+			text-align: center;
+			background: #d0b164;
+			color: #412300;
+			transition: 1s ease;
+		}
+		html[数字="null"]{
+			background: #b3d0d0;
+			color: #002b41;
+		}
+		body{
+			margin: 0;
+			padding: 0 0 100px;
+		}
+		a{
+			color:blue;
+		}
+		header{
+			padding:3em 0 2em;
+		}
+		input{
+			outline:0;
+			font-size:20px;
+			line-height: 26px;
+			text-align: center;
+
+			padding:8px 12px;
+			border:0;
+			width: 80%;
+			max-width:300px;
+			-webkit-appearance: none;
+		}
+		#恶臭{
+			font-size:24px;
+			font-family: "Comic Sans MS";
+			padding:40px 10px 100px;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<h1>恶臭数字论证器</h1>
+		<p>将任意数字恶臭化的工具</p>
+	</header>
+
+	<input id="学弟" type="number" placeholder="输入任意数字">
+	<div id="恶臭"></div>
+
+	<article>
+		<h2>仓库地址</h2>
+		<p><a href="https://github.com/itorr/homo" target="_blank">https://github.com/itorr/homo</a></p>
+	</article>
+
+	<script src="homo.js"></script>
+	<script>
+		学弟.oninput=()=>{
+			let 数字 = +学弟.value;
+			if(!数字){
+				数字 = '';
+			}
+			let 公式 = homo(数字);
+
+			恶臭.innerHTML = 数字 +' = <big>'+ 公式 + '</big>';
+
+			容器.setAttribute('数字',数字);
+		};
+
+		学弟.oninput();
+
+		const loadScript = (src,el) =>{
+			el = document.createElement('script');
+			el.src = src;
+			document.body.appendChild(el);
+		};
+
+		setTimeout(()=>{
+			loadScript('//s4.cnzz.com/z_stat.php?id=1278706389&web_id=1278706389');
+		},400);
+	</script>
+</body>
+</html>
