@@ -62,7 +62,7 @@
 	<script src="homo.js"></script>
 	<script>
 		学弟.oninput=()=>{
-			let 数字 = 学弟.value.match(/-?[\de\.]+/);
+			let 数字 = 学弟.value.trim().match(/^-?[\de\.]+$/);
 
 			数字 = 数字? +数字 : '';
 
