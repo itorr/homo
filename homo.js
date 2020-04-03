@@ -1,8 +1,6 @@
 const homo = (Nums=>{
 
-	const numsReversed = Object.keys(Nums);//.sort((a,b)=>b-a);
-
-	console.log(numsReversed);
+	const numsReversed = Object.keys(Nums);
 
 	const getMinDiv = num =>{
 		for(let i = numsReversed.length;i >= 0;i--)
@@ -13,8 +11,7 @@ const homo = (Nums=>{
 	const demolish = num =>{
 		if(typeof num !== 'number')return '';
 
-		if(num<0 || num === Infinity)return '这么恶臭的数有必要论证吗';
-		//|| /e/.test(num)
+		if(num<0 || num === Infinity || Number.isNaN(num))return '这么恶臭的数有必要论证吗';
 
 		if(Nums[num])return String(num);
 

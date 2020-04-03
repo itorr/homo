@@ -51,7 +51,7 @@
 		<p>数字恶臭化工具</p>
 	</header>
 
-	<input id="学弟" type="number" placeholder="输入任意数字">
+	<input id="学弟" placeholder="输入任意数字">
 	<div id="恶臭"></div>
 
 	<article>
@@ -63,14 +63,11 @@
 	<script>
 		学弟.oninput=()=>{
 			let 数字 = 学弟.value.match(/-?[\de\.]+/);
-			if(数字){
-				数字 = +数字;
-			}else{
-				数字 = '';
-			}
-			let 公式 = homo(数字);
 
-			恶臭.innerHTML = 数字 +' = <big>'+ 公式 + '</big>';
+			数字 = 数字? +数字 : '';
+
+
+			恶臭.innerHTML = 数字 +' = <big>'+ homo(数字) + '</big>';
 
 			容器.setAttribute('数字',数字);
 		};
