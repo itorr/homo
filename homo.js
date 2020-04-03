@@ -1,10 +1,12 @@
 const homo = (Nums=>{
 
-	const numsReversed = Object.keys(Nums).sort((a,b)=>b-a);
+	const numsReversed = Object.keys(Nums);//.sort((a,b)=>b-a);
+
+	console.log(numsReversed);
 
 	const getMinDiv = num =>{
-		for(let i=0;i<numsReversed.length;i++)
-			if(num>numsReversed[i])
+		for(let i = numsReversed.length;i >= 0;i--)
+			if(num >= numsReversed[i])
 				return numsReversed[i];
 	};
 
@@ -20,7 +22,10 @@ const homo = (Nums=>{
 		return `${div}*(${demolish(Math.floor(num/div))})+(${demolish(num%div)})`.replace(/\*\(1\)|\+\(0\)$/g,'');
 	};
 
-	return num =>demolish(num).replace(/\d+/g,n=>Nums[n])
+
+	return num =>{
+		return demolish(num).replace(/\d+/g,n=>Nums[n])
+	}
 })({
 	114514: "114514",
 	58596: "114*514",
