@@ -10,6 +10,7 @@ const homo = (Nums=>{
 
 	const demolish = num =>{
 		if(typeof num !== 'number')return '';
+		if(num<0)return '这么恶臭的自然常数有必要论证吗';
 
 		if(Nums[num])return String(num);
 
