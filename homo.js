@@ -10,7 +10,9 @@ const homo = (Nums=>{
 
 	const demolish = num =>{
 		if(typeof num !== 'number')return '';
-		if(num<0)return '这么恶臭的数有必要论证吗';
+
+		if(num<0 || num === Infinity)return '这么恶臭的数有必要论证吗';
+		//|| /e/.test(num)
 
 		if(Nums[num])return String(num);
 
