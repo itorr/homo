@@ -6,7 +6,7 @@
 
 ## 引用方式
 ```HTML
-<script arc="homo.js"></script>
+<script src="homo.js"></script>
 <script>
 let 恶臭 = homo(1919810);
 // "114514*(11-4-5+14)+(114*514+(114*51*4+(1145*(1+4)+(11-4+5+1-4))))"
