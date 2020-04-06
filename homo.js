@@ -11,7 +11,9 @@ const homo = (Nums=>{
 	const demolish = num =>{
 		if(typeof num !== 'number')return '';
 
-		if(num<0 || num === Infinity || Number.isNaN(num))return '这么恶臭的数有必要论证吗';
+		if(num === Infinity || Number.isNaN(num) || /\./.test(num))return '这么恶臭的数有必要论证吗';
+
+		if(num<0)return `(${demolish(num*-1)})*(d)`;
 
 		if(Nums[num])return String(num);
 
@@ -21,7 +23,7 @@ const homo = (Nums=>{
 
 
 	return num =>{
-		return demolish(num).replace(/\d+/g,n=>Nums[n])
+		return demolish(num).replace(/[\dd]+/g,n=>Nums[n])
 	}
 })({
 	114514: "114514",
@@ -542,5 +544,6 @@ const homo = (Nums=>{
 	3: "11*-4+51-4",
 	2: "-11+4-5+14",
 	1: "11/(45-1)*4",
-	0: "(1-1)*4514"
+	0: "(1-1)*4514",
+	"d": "11/(45-1)*-4"
 });

@@ -2,8 +2,10 @@
 <html id="容器">
 <head>
 	<meta charset="UTF-8">
-	<title>恶臭数字论证器 - 野兽先辈论证生成器 - 114514 - 神奇海螺</title>
+	<title>恶臭数字论证器</title>
 	<meta name="viewport" content="width=device-width,user-scalable=0">
+	<meta name="discription" content="数字恶臭化工具">
+	<meta name="keyword" content="野兽先辈论证生成器,114514,神奇海螺">
 	<style>
 		html{
 			text-align: center;
@@ -16,15 +18,32 @@
 			background: #b3d0d0;
 			color: #002b41;
 		}
+		head{
+			display: block;
+			text-align: center;
+			padding:3em 0 2em;
+		}
+		title{
+			display: block;
+			font-weight: 700;
+			font-size: 2em;
+			margin: 0.67em;
+			line-height: 45px;
+
+		}
+		meta[name="discription"]{
+			display: block;
+			margin:1em 0;
+		}
+		meta[name="discription"]:after{
+			content: attr(content);
+		}
 		body{
 			margin: 0;
 			padding: 0 0 100px;
 		}
 		a{
 			color:blue;
-		}
-		header{
-			padding:3em 0 2em;
 		}
 		input{
 			outline:0;
@@ -46,11 +65,6 @@
 	</style>
 </head>
 <body>
-	<header>
-		<h1>恶臭数字论证器</h1>
-		<p>数字恶臭化工具</p>
-	</header>
-
 	<input id="学弟" placeholder="输入任意数字">
 	<div id="恶臭"></div>
 
@@ -74,14 +88,14 @@
 
 		学弟.oninput();
 
-		const loadScript = (src,el) =>{
+		const 加载脚本 = (src,el) =>{
 			el = document.createElement('script');
 			el.src = src;
 			document.body.appendChild(el);
 		};
 
 		setTimeout(()=>{
-			loadScript('//s4.cnzz.com/z_stat.php?id=1278706389&web_id=1278706389');
+			加载脚本('//s4.cnzz.com/z_stat.php?id=1278706389&web_id=1278706389');
 		},400);
 	</script>
 </body>
