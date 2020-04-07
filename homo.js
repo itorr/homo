@@ -7,13 +7,18 @@ const homo = (Nums=>{
 			if(num >= numsReversed[i])
 				return numsReversed[i];
 	};
-
+	const isDotRegex = /(?<=\.)\d+/;
 	const demolish = num =>{
 		if(typeof num !== 'number')return '';
 
-		if(num === Infinity || Number.isNaN(num) || /\./.test(num))return '这么恶臭的数有必要论证吗';
+		if(num === Infinity || Number.isNaN(num))return '这么恶臭的数有必要论证吗';
 
 		if(num<0)return `(${demolish(num*-1)})*(d)`;
+
+		if(isDotRegex.test(num)){
+			const n = String(num).match(isDotRegex)[0].length;
+			return `(${demolish(num*Math.pow(10,n))})${Array(n+1).join('/(10)')}`;
+		}
 
 		if(Nums[num])return String(num);
 
@@ -545,5 +550,6 @@ const homo = (Nums=>{
 	2: "-11+4-5+14",
 	1: "11/(45-1)*4",
 	0: "(1-1)*4514",
-	"d": "11/(45-1)*-4"
+	"d": "11-4-5+1-4",
+
 });
