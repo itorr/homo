@@ -1,13 +1,11 @@
 const homo = (Nums=>{
-
 	const numsReversed = Object.keys(Nums);
-
 	const getMinDiv = num =>{
 		for(let i = numsReversed.length;i >= 0;i--)
 			if(num >= numsReversed[i])
 				return numsReversed[i];
 	};
-	const isDotRegex = /(?<=\.)\d+/;
+	const isDotRegex = /\.\d+/;
 	const demolish = num =>{
 		if(typeof num !== 'number')return '';
 
@@ -17,7 +15,7 @@ const homo = (Nums=>{
 
 		if(isDotRegex.test(num)){
 			const n = String(num).match(isDotRegex)[0].length;
-			return `(${demolish(num*Math.pow(10,n))})${Array(n+1).join('/(10)')}`;
+			return `(${demolish(num*Math.pow(10,n-1))})${Array(n).join('/(10)')}`;
 		}
 
 		if(Nums[num])return String(num);
@@ -25,11 +23,7 @@ const homo = (Nums=>{
 		const div = getMinDiv(num);
 		return `${div}*(${demolish(Math.floor(num/div))})+(${demolish(num%div)})`.replace(/\*\(1\)|\+\(0\)$/g,'');
 	};
-
-
-	return num =>{
-		return demolish(num).replace(/[\dd]+/g,n=>Nums[n])
-	}
+	return num =>demolish(num).replace(/[\dd]+/g,n=>Nums[n]);
 })({
 	114514: "114514",
 	58596: "114*514",
@@ -551,5 +545,4 @@ const homo = (Nums=>{
 	1: "11/(45-1)*4",
 	0: "(1-1)*4514",
 	"d": "11-4-5+1-4",
-
 });
