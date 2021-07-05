@@ -14,7 +14,7 @@ const homo = ((Nums) => {
 			return `这么恶臭的${num}有必要论证吗`
 
 		if (num < 0)
-			return `(d)*(${demolish(num * -1)})`
+			return `(⑨)*(${demolish(num * -1)})`
 
 		if (!Number.isInteger(num)) {
 			// abs(num) is definitely smaller than 2**51
@@ -31,7 +31,7 @@ const homo = ((Nums) => {
 			num % div
 		)})`.replace(/\*\(1\)|\+\(0\)$/g, "")
 	}
-	return (num) => demolish(num).replace(/[\dd]+/g, (n) => Nums[n]).replace("^", "**")
+	return (num) => demolish(num).replace(/\d+|⑨/g, (n) => Nums[n]).replace("^", "**")
 })({
 	114514: "114514",
 	58596: "114*514",
@@ -552,7 +552,7 @@ const homo = ((Nums) => {
 	2: "-11+4-5+14",
 	1: "11/(45-1)*4",
 	0: "(1-1)*4514",
-	d: "11-4-5+1-4",
+	"⑨": "11-4-5+1-4",
 })
 
 if (typeof module === 'object' && module.exports)
