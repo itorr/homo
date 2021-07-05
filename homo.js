@@ -14,7 +14,7 @@ const homo = ((Nums) => {
 			return `这么恶臭的${num}有必要论证吗`
 
 		if (num < 0)
-			return `(⑨)*(${demolish(num * -1)})`
+			return `(⑨)*(${demolish(num * -1)})`.replace(/\*\(1\)/g, "")
 
 		if (!Number.isInteger(num)) {
 			// abs(num) is definitely smaller than 2**51
