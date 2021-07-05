@@ -1,29 +1,37 @@
-const homo = (Nums=>{
-	const numsReversed = Object.keys(Nums);
-	const getMinDiv = num =>{
-		for(let i = numsReversed.length;i >= 0;i--)
-			if(num >= numsReversed[i])
-				return numsReversed[i];
-	};
-	const isDotRegex = /\.\d+/;
-	const demolish = num =>{
-		if(typeof num !== 'number')return '';
+const homo = ((Nums) => {
+	const numsReversed = Object.keys(Nums).map(x => +x).filter(x => x > 0)
+	const getMinDiv = (num) => {
+		for (let i = numsReversed.length; i >= 0; i--)
+			if (num >= numsReversed[i])
+				return numsReversed[i]
+	}
+	const isDotRegex = /\.(\d+?)0+$/
+	const demolish = (num) => {
+		if (typeof num !== "number")
+			return ""
 
-		if(num === Infinity || Number.isNaN(num))return '这么恶臭的数有必要论证吗';
+		if (num === Infinity || Number.isNaN(num))
+			return `这么恶臭的${num}有必要论证吗`
 
-		if(num<0)return `(${demolish(num*-1)})*(d)`;
+		if (num < 0)
+			return `(d)*(${demolish(num * -1)})`
 
-		if(isDotRegex.test(num)){
-			const n = String(num).match(isDotRegex)[0].length;
-			return `(${demolish(num*Math.pow(10,n-1))})${Array(n).join('/(10)')}`;
+		if (!Number.isInteger(num)) {
+			// abs(num) is definitely smaller than 2**51
+			// rescale
+			const n = num.toFixed(16).match(isDotRegex)[1].length
+			return `(${demolish(num * Math.pow(10, n))})/(10)^(${n})`
 		}
 
-		if(Nums[num])return String(num);
+		if (Nums[num])
+			return String(num)
 
-		const div = getMinDiv(num);
-		return `${div}*(${demolish(Math.floor(num/div))})+(${demolish(num%div)})`.replace(/\*\(1\)|\+\(0\)$/g,'');
-	};
-	return num =>demolish(num).replace(/[\dd]+/g,n=>Nums[n]);
+		const div = getMinDiv(num)
+		return `${div}*(${demolish(Math.floor(num / div))})+(${demolish(
+			num % div
+		)})`.replace(/\*\(1\)|\+\(0\)$/g, "")
+	}
+	return (num) => demolish(num).replace(/[\dd]+/g, (n) => Nums[n]).replace("^", "**")
 })({
 	114514: "114514",
 	58596: "114*514",
