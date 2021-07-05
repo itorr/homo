@@ -544,5 +544,9 @@ const homo = (Nums=>{
 	2: "-11+4-5+14",
 	1: "11/(45-1)*4",
 	0: "(1-1)*4514",
-	"d": "11-4-5+1-4",
-});
+	d: "11-4-5+1-4",
+})
+
+if (typeof module === 'object' && module.exports)
+	module.exports = homo
+
