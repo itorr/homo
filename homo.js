@@ -27,9 +27,8 @@ const homo = ((Nums) => {
 			return String(num)
 
 		const div = getMinDiv(num)
-		return `${div}*(${demolish(Math.floor(num / div))})+(${demolish(
-			num % div
-		)})`.replace(/\*\(1\)|\+\(0\)$/g, "")
+		return (`${div}*(${demolish(Math.floor(num / div))})+` +
+			`(${demolish(num % div)})`).replace(/\*\(1\)|\+\(0\)$/g, "")
 	}
 	return (num) => demolish(num).replace(/\d+|⑨/g, (n) => Nums[n]).replace("^", "**")
 })({
