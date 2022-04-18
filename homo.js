@@ -5,7 +5,7 @@ const homo = ((Nums) => {
 			if (num >= numsReversed[i])
 				return numsReversed[i]
 	}
-	const isDotRegex = /\.(\d+?)0+$/
+	const isDotRegex = /\.(\d+?)0{0,}$/
 	const demolish = (num) => {
 		if (typeof num !== "number")
 			return ""
