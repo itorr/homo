@@ -11,7 +11,7 @@ const homo = ((Nums) => {
 			return ""
 
 		if (num === Infinity || Number.isNaN(num))
-			return `这么恶臭的${num}有必要论证吗`
+			return `这么恶臭的数字有必要论证吗`
 
 		if (num < 0)
 			return `(⑨)*(${demolish(num * -1)})`.replace(/\*\(1\)/g, "")
