@@ -44,7 +44,8 @@
 			padding: 0 0 100px;
 		}
 		a{
-			color:blue;
+			color:#0080ff;
+			text-decoration: none;
 		}
 		input{
 			outline:0;
@@ -64,27 +65,38 @@
 			padding:40px 10px 100px;
 
 		}
+		footer{
+			padding:80px 0;
+			font-size: .8em;
+			font-family: "Comic Sans MS", script;
+			text-shadow: 0 1px 1px rgba(0,0,0,.2);
+		}
+		footer p{
+			opacity: 0.5;
+			padding:20px 0;
+		}
+		footer a{
+			margin:0 .5em;
+			color: inherit;
+		}
 	</style>
 </head>
 <body>
 	<input id="学弟" placeholder="输入任意数字">
 	<div id="恶臭"></div>
 
-	<article>
-		<h2>仓库地址</h2>
-		<p><a href="https://github.com/itorr/homo" target="_blank">https://github.com/itorr/homo</a></p>
-	</article>
+	<footer>
+		<p>复制请保持开源并保留版权信息</p>
+		<a href="https://github.com/itorr/homo">GitHub</a>
+		<a href="https://weibo.com/1197780522/IBBhqjdbT">Weibo</a>
+		<a href="https://lab.magiconch.com/">Lab.</a>
+	</footer>
 
 	<script src="homo.js"></script>
 	<script>
-		学弟.oninput=()=>{
-			let 数字 = +学弟.value.trim().match(/^-?[\de\.]+$/);
-
-			数字 = 数字? 数字 : '';
-
-
+		学弟.oninput = _=>{
+			const 数字 = +学弟.value.trim().match(/^-?[\de\.]+$/) || '';
 			恶臭.innerHTML = 数字 +' = <big>'+ homo(数字) + '</big>';
-
 			容器.setAttribute('数字',数字);
 		};
 
@@ -96,8 +108,8 @@
 			document.body.appendChild(el);
 		};
 
-		setTimeout(()=>{
-			加载脚本('//s4.cnzz.com/z_stat.php?id=1278706389&web_id=1278706389');
+		setTimeout(_=>{
+			加载脚本('https://hm.baidu.com/hm.js?f4e477c61adf5c145ce938a05611d5f0');
 		},400);
 	</script>
 </body>
