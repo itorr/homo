@@ -30,7 +30,18 @@ const homo = ((Nums) => {
 		return (`${div}*(${demolish(Math.floor(num / div))})+` +
 			`(${demolish(num % div)})`).replace(/\*\(1\)|\+\(0\)$/g, "")
 	}
-	return (num) => demolish(num).replace(/\d+|⑨/g, (n) => Nums[n]).replace("^", "**")
+	//Finisher
+	const finisher = (expr) => {
+		expr=expr.replace(/\d+|⑨/g, (n) => Nums[n]).replace("^", "**")
+		//As long as it matches \(([^\+\)\-]+)\), replace it with $1
+		while (expr.match(/\([^\+\)\-]+?\)/))
+			expr = expr.replace(/\(([^\+\)\-]+)\)/g, "$1")
+		//If there is a bracket in the outermost part, remove it
+		if (expr.match(/^\([^)]+?\)$/))
+			expr = expr.replace(/^\(([^)]+)\)$/, "$1")
+		return expr
+	}
+	return (num) => finisher(demolish(num))
 })({
 	114514: "114514",
 	58596: "114*514",
