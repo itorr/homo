@@ -82,7 +82,7 @@
 	</style>
 </head>
 <body>
-	<input id="学弟" placeholder="输入任意数字">
+	<input id="学弟" placeholder="输入任意数字" type="number">
 	<div id="恶臭"></div>
 
 	<footer>
@@ -95,7 +95,7 @@
 	<script src="homo.js"></script>
 	<script>
 		学弟.oninput = _=>{
-			const 数字 = +学弟.value.trim().match(/^-?[\de\.]+$/) || '';
+			const 数字 = 学弟.value === '' ? '' : Number(学弟.value);
 			恶臭.innerHTML = 数字 +' = <big>'+ homo(数字) + '</big>';
 			容器.setAttribute('数字',数字);
 		};
