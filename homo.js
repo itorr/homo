@@ -30,8 +30,26 @@ const homo = ((Nums) => {
 		return (`${div}*(${demolish(Math.floor(num / div))})+` +
 			`(${demolish(num % div)})`).replace(/\*\(1\)|\+\(0\)$/g, "")
 	}
-	return (num) => demolish(num).replace(/\d+|⑨/g, (n) => Nums[n]).replace("^", "**")
+	//Finisher
+	const finisher = (expr) => {
+		expr=expr.replace(/\d+|⑨/g, (n) => Nums[n]).replace("^", "**")
+		//As long as it matches ([\*|\/])\(([^\+\-\(\)]+)\), replace it with $1$2
+		while (expr.match(/[\*|\/]\([^\+\-\(\)]+\)/))
+			expr = expr.replace(/([\*|\/])\(([^\+\-\(\)]+)\)/, (m, $1, $2) => $1 + $2)
+		//As long as it matches ([\+|\-])\(([^\(\)]+)\)([\+|\-|\)]), replace it with $1$2$3
+		while (expr.match(/[\+|\-]\([^\(\)]+\)[\+|\-|\)]/))
+			expr = expr.replace(/([\+|\-])\(([^\(\)]+)\)([\+|\-|\)])/, (m, $1, $2, $3) => $1 + $2 + $3)
+		//As long as it matches ([\+|\-])\(([^\(\)]+)\)$, replace it with $1$2
+		while (expr.match(/[\+|\-]\(([^\(\)]+)\)$/))
+			expr = expr.replace(/([\+|\-])\(([^\(\)]+)\)$/, (m, $1, $2) => $1 + $2)
+		//If there is a bracket in the outermost part, remove it
+		if (expr.match(/^\([^\(\)]+?\)$/))
+			expr = expr.replace(/^\(([^\(\)]+)\)$/, "$1")
+		return expr
+	}
+	return (num) => finisher(demolish(num))
 })({
+	229028: "(114514+114514)",
 	114514: "114514",
 	58596: "114*514",
 	49654: "11*4514",
