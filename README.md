@@ -16,6 +16,5 @@ let 恶臭 = homo(1919810);
 ## 仓库地址
 [https://github.com/itorr/homo](https://github.com/itorr/homo)
 
-
-## 警告
-复制请保持开源并保留版权信息
+## 协议
+MIT
