@@ -32,7 +32,7 @@ const homo = ((Nums) => {
 	}
 	//Finisher
 	const finisher = (expr) => {
-		expr=expr.replace(/\d+|⑨/g, (n) => Nums[n]).replace("^", "**")
+		expr = expr.replace(/\d+|⑨/g, (n) => Nums[n]).replace("^", "**")
 		//As long as it matches ([\*|\/])\(([^\+\-\(\)]+)\), replace it with $1$2
 		while (expr.match(/[\*|\/]\([^\+\-\(\)]+\)/))
 			expr = expr.replace(/([\*|\/])\(([^\+\-\(\)]+)\)/, (m, $1, $2) => $1 + $2)
@@ -45,6 +45,8 @@ const homo = ((Nums) => {
 		//If there is a bracket in the outermost part, remove it
 		if (expr.match(/^\([^\(\)]+?\)$/))
 			expr = expr.replace(/^\(([^\(\)]+)\)$/, "$1")
+
+		expr = expr.replace(/\+-/g,'-')
 		return expr
 	}
 	return (num) => finisher(demolish(num))
