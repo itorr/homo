@@ -25,6 +25,8 @@ const homo = ((Nums) => {
 
 		if (Nums[num])
 			return String(num)
+		if (num % 114514 === 0)
+			return `(${demolish(num / 114514)})×114514`
 
 		const div = getMinDiv(num)
 		return (`${div}*(${demolish(Math.floor(num / div))})+` +
