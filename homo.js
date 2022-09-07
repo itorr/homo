@@ -47,6 +47,7 @@ const homo = ((Nums) => {
 			expr = expr.replace(/^\(([^\(\)]+)\)$/, "$1")
 
 		expr = expr.replace(/\+-/g,'-')
+		expr = expr.replace(/\*\*/g, "^")
 		return expr
 	}
 	return (num) => finisher(demolish(num))
