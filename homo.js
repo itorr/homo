@@ -7,11 +7,8 @@ const homo = ((Nums) => {
 	}
 	const isDotRegex = /\.(\d+?)0{0,}$/
 	const demolish = (num) => {
-		if (typeof num !== "number")
-			return ""
-
-		if (num === Infinity || Number.isNaN(num))
-			return `这么恶臭的${num}有必要论证吗`
+		if (typeof num !== "number" || num === Infinity || Number.isNaN(num))
+			return 114514
 
 		if (num < 0)
 			return `(⑨)*(${demolish(num * -1)})`.replace(/\*\(1\)/g, "")
@@ -51,7 +48,19 @@ const homo = ((Nums) => {
 		expr = expr.replace(/\*\*/g, "^")
 		return expr
 	}
-	return (num) => finisher(demolish(num))
+	//Check if the result of the string returned by finisher(demolish(num)) is num
+	const checker = (expr,num) => {
+		if (typeof num !== "number")
+			return "林檎！林檎！"
+		if (num === Infinity || Number.isNaN(num))
+			return `这么恶臭的${num}有必要论证吗`
+		const res = eval(expr)
+		if (res === num)
+			return expr
+		else
+			return "论证失败（悲）"
+	}
+	return (num) => checker(finisher(demolish(num)),num)
 })({
 	229028: "(114514+114514)",
 	114514: "114514",
