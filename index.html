@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html id="容器">
+
 <head>
 	<meta charset="UTF-8">
 	<title>恶臭数字论证器</title>
 	<meta name="viewport" content="width=device-width,user-scalable=0">
-	<meta name="discription" content="数字恶臭化工具">
+	<meta name="description" content="数字恶臭化工具">
 	<meta name="keyword" content="野兽先辈论证生成器,114514,神奇海螺">
 	<style>
-		html{
+		html {
 			text-align: center;
 			background: #d0b164;
 			color: #412300;
@@ -15,16 +16,19 @@
 			font-family: sans-serif;
 			word-break: break-all;
 		}
-		html[数字=""]{
+
+		html[数字=""] {
 			background: #b3d0d0;
 			color: #002b41;
 		}
-		head{
+
+		head {
 			display: block;
 			text-align: center;
-			padding:3em 0 2em;
+			padding: 3em 0 2em;
 		}
-		title{
+
+		title {
 			display: block;
 			font-weight: 700;
 			font-size: 2em;
@@ -32,55 +36,65 @@
 			line-height: 45px;
 
 		}
-		meta[name="discription"]{
+
+		meta[name="description"] {
 			display: block;
-			margin:1em 0;
+			margin: 1em 0;
 		}
-		meta[name="discription"]:after{
+
+		meta[name="description"]:after {
 			content: attr(content);
 		}
-		body{
+
+		body {
 			margin: 0;
 			padding: 0 0 100px;
 		}
-		a{
-			color:#0080ff;
+
+		a {
+			color: #0080ff;
 			text-decoration: none;
 		}
-		input{
-			outline:0;
-			font-size:20px;
+
+		input {
+			outline: 0;
+			font-size: 20px;
 			line-height: 26px;
 			text-align: center;
 
-			padding:8px 12px;
-			border:0;
+			padding: 8px 12px;
+			border: 0;
 			width: 80%;
-			max-width:300px;
+			max-width: 300px;
 			-webkit-appearance: none;
 		}
-		#恶臭{
-			font-size:24px;
+
+		#恶臭 {
+			font-size: 24px;
 			font-family: "Comic Sans MS", script;
-			padding:40px 10px 100px;
+			padding: 40px 10px 100px;
 
 		}
-		footer{
-			padding:80px 0;
+
+		footer {
+			padding: 80px 0;
 			font-size: .8em;
 			font-family: "Comic Sans MS", script;
-			text-shadow: 0 1px 1px rgba(0,0,0,.2);
+			text-shadow: 0 1px 1px rgba(0, 0, 0, .2);
 		}
-		footer p{
+
+		footer p {
 			opacity: 0.5;
-			padding:20px 0;
+			padding: 20px 0;
 		}
-		footer a{
-			margin:0 .5em;
+
+		footer a {
+			margin: 0.5em;
 			color: inherit;
 		}
 	</style>
 </head>
+
 <body>
 	<input id="学弟" placeholder="输入任意数字" type="number">
 	<div id="恶臭"></div>
@@ -94,13 +108,14 @@
 
 	<script src="homo.js"></script>
 	<script>
-		学弟.oninput = _=>{
+		学弟.oninput = _ => {
 			const 数字 = 学弟.value === '' ? '' : Number(学弟.value);
-			恶臭.innerHTML = 数字 +' = <big>'+ homo(数字) + '</big>';
-			容器.setAttribute('数字',数字);
+			恶臭.innerHTML = 数字 + ' = <big>' + homo(数字) + '</big>';
+			容器.setAttribute('数字', 数字);
 		};
 
 		学弟.oninput();
 	</script>
 </body>
+
 </html>
