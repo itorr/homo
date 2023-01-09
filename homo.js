@@ -44,7 +44,7 @@ const homo = ((numsTable) => {
 		return rst.replace("*(1)", "").replace("+(0)", "").replace("^(1)", "")
 	}
 
-	const trimer = (expr) => {
+	const finisher = (expr) => {
 		// 将所有表内值转换为具体记录的表达式并且把^换成**
 		expr = expr.replace(/\d+|⑨/g, (n) => numsTable[n]).replace("^", "**")
 
@@ -68,7 +68,7 @@ const homo = ((numsTable) => {
 		expr = expr.replace(/\+-/g, '-')
 		return expr
 	}
-	return (num) => trimer(breakNumber(num))
+	return (num) => finisher(breakNumber(num))
 })({
 	229028: "(114514+114514)",
 	114514: "114514",
