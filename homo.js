@@ -1,55 +1,74 @@
-const homo = ((Nums) => {
-	const numsReversed = Object.keys(Nums).map(x => +x).filter(x => x > 0)
-	const getMinDiv = (num) => {
-		for (let i = numsReversed.length; i >= 0; i--)
-			if (num >= numsReversed[i])
-				return numsReversed[i]
+const homo = ((numsTable) => {
+
+	//将js对象形式的表转成数组, 表示所有打表后的数
+	const numsArrayDescending = Object.keys(numsTable).map(x => x).filter(x => x > 0)
+
+	//获得小于num的最大已打表的值
+	const getMaximumRecordedLessThan = (num) => {
+		for (let i = numsArrayDescending.length; i >= 0; i--)
+			if (num >= numsArrayDescending[i])
+				return numsArrayDescending[i]
 	}
-	const isDotRegex = /\.(\d+?)0{0,}$/
-	const demolish = (num) => {
+	//用于获取小数点后有效数字个数的正则
+	const afterPointDigitsOfNumRegex = /\.(\d+?)0{0,}$/
+
+	// 将数字打碎为表内已有数字间的运算
+	const breakNumbers = (num) => {
 		if (typeof num !== "number")
 			return ""
 
 		if (num === Infinity || Number.isNaN(num))
 			return `这么恶臭的${num}有必要论证吗`
 
+		// 数字小于0, 前面乘个-1然后返回正数打碎后的式子
 		if (num < 0)
-			return `(⑨)*(${demolish(num * -1)})`.replace(/\*\(1\)/g, "")
+			return `(⑨)*(${breakNumbers(num * -1)})`
 
+		// 非整数
 		if (!Number.isInteger(num)) {
-			// abs(num) is definitely smaller than 2**51
-			// rescale
-			const n = num.toFixed(16).match(isDotRegex)[1].length
-			return `(${demolish(num * Math.pow(10, n))})/(10)^(${n})`
+			// n为小数点后有效数字个数
+			const n = num.toFixed(16).match(afterPointDigitsOfNumRegex)[1].length
+			return `(${breakNumbers(num * Math.pow(10, n))})/(10)^(${n})`.replace("^(1)", "")
 		}
 
-		if (Nums[num])
+		// 表内已有值直接返回
+		if (numsTable[num])
 			return String(num)
 
-		const div = getMinDiv(num)
-		return (`${div}*(${demolish(Math.floor(num / div))})+` +
-			`(${demolish(num % div)})`).replace(/\*\(1\)|\+\(0\)$/g, "")
+		const maximumRecordedNum = getMaximumRecordedLessThan(num);
+
+		// 将不在表内的数字转换成已有数字的表达式, 具体算法是个数学问题, 可以自己琢磨琢磨
+		const rst = `${maximumRecordedNum}*(${breakNumbers(Math.floor(num / maximumRecordedNum))})+` + `(${breakNumbers(num % maximumRecordedNum)})`
+
+		//把所有 *(1) 和 +(0) 和 ^(1) 这种无意义式子去掉
+		return rst.replace("*(1)", "").replace("+(0)", "").replace("^(1)", "")
 	}
-	//Finisher
-	const finisher = (expr) => {
-		expr = expr.replace(/\d+|⑨/g, (n) => Nums[n]).replace("^", "**")
-		//As long as it matches ([\*|\/])\(([^\+\-\(\)]+)\), replace it with $1$2
+
+	const trimer = (expr) => {
+		// 将所有表内值转换为具体记录的表达式并且把^换成**
+		expr = expr.replace(/\d+|⑨/g, (n) => numsTable[n]).replace("^", "**")
+
+		// 去乘除一个只有乘除没有括号的式子时可去除括号
 		while (expr.match(/[\*|\/]\([^\+\-\(\)]+\)/))
 			expr = expr.replace(/([\*|\/])\(([^\+\-\(\)]+)\)/, (m, $1, $2) => $1 + $2)
-		//As long as it matches ([\+|\-])\(([^\(\)]+)\)([\+|\-|\)]), replace it with $1$2$3
+
+		// 一个式子如果里面没括号且外边只有+-时可去除括号
 		while (expr.match(/[\+|\-]\([^\(\)]+\)[\+|\-|\)]/))
 			expr = expr.replace(/([\+|\-])\(([^\(\)]+)\)([\+|\-|\)])/, (m, $1, $2, $3) => $1 + $2 + $3)
-		//As long as it matches ([\+|\-])\(([^\(\)]+)\)$, replace it with $1$2
+
+		// 加减一个处于末尾的表达式可以去除括号
 		while (expr.match(/[\+|\-]\(([^\(\)]+)\)$/))
 			expr = expr.replace(/([\+|\-])\(([^\(\)]+)\)$/, (m, $1, $2) => $1 + $2)
-		//If there is a bracket in the outermost part, remove it
+
+		// 去除最外围的括号			
 		if (expr.match(/^\([^\(\)]+?\)$/))
 			expr = expr.replace(/^\(([^\(\)]+)\)$/, "$1")
 
-		expr = expr.replace(/\+-/g,'-')
+		// +- 直接连接时去除+号
+		expr = expr.replace(/\+-/g, '-')
 		return expr
 	}
-	return (num) => finisher(demolish(num))
+	return (num) => trimer(breakNumbers(num))
 })({
 	229028: "(114514+114514)",
 	114514: "114514",
@@ -576,4 +595,3 @@ const homo = ((Nums) => {
 
 if (typeof module === 'object' && module.exports)
 	module.exports = homo
-
