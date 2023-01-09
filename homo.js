@@ -13,7 +13,7 @@ const homo = ((numsTable) => {
 	const afterPointDigitsOfNumRegex = /\.(\d+?)0{0,}$/
 
 	// 将数字打碎为表内已有数字间的运算
-	const breakNumbers = (num) => {
+	const breakNumber = (num) => {
 		if (typeof num !== "number")
 			return ""
 
@@ -22,13 +22,13 @@ const homo = ((numsTable) => {
 
 		// 数字小于0, 前面乘个-1然后返回正数打碎后的式子
 		if (num < 0)
-			return `(⑨)*(${breakNumbers(num * -1)})`
+			return `(⑨)*(${breakNumber(num * -1)})`
 
 		// 非整数
 		if (!Number.isInteger(num)) {
 			// n为小数点后有效数字个数
 			const n = num.toFixed(16).match(afterPointDigitsOfNumRegex)[1].length
-			return `(${breakNumbers(num * Math.pow(10, n))})/(10)^(${n})`.replace("^(1)", "")
+			return `(${breakNumber(num * Math.pow(10, n))})/(10)^(${n})`.replace("^(1)", "")
 		}
 
 		// 表内已有值直接返回
@@ -38,7 +38,7 @@ const homo = ((numsTable) => {
 		const maximumRecordedNum = getMaximumRecordedLessThan(num);
 
 		// 将不在表内的数字转换成已有数字的表达式, 具体算法是个数学问题, 可以自己琢磨琢磨
-		const rst = `${maximumRecordedNum}*(${breakNumbers(Math.floor(num / maximumRecordedNum))})+` + `(${breakNumbers(num % maximumRecordedNum)})`
+		const rst = `${maximumRecordedNum}*(${breakNumber(Math.floor(num / maximumRecordedNum))})+` + `(${breakNumber(num % maximumRecordedNum)})`
 
 		//把所有 *(1) 和 +(0) 和 ^(1) 这种无意义式子去掉
 		return rst.replace("*(1)", "").replace("+(0)", "").replace("^(1)", "")
@@ -68,7 +68,7 @@ const homo = ((numsTable) => {
 		expr = expr.replace(/\+-/g, '-')
 		return expr
 	}
-	return (num) => trimer(breakNumbers(num))
+	return (num) => trimer(breakNumber(num))
 })({
 	229028: "(114514+114514)",
 	114514: "114514",
