@@ -108,6 +108,7 @@
 
 	<script src="homo.js"></script>
 	<script>
+		homo.onUpgrade = () => 学弟.oninput();
 		学弟.oninput = _ => {
 			const 数字 = 学弟.value === '' ? '' : Number(学弟.value);
 			恶臭.innerHTML = 数字 + ' = <big>' + homo(数字) + '</big>';
