@@ -112,15 +112,68 @@ console.log(`扩展值集条目: ${table.size.toLocaleString('en-US')}`);
   check(homo(-0) === homo(0) || evalStr(homo.evalStr(-0)) === 0, 'homo(-0) 表示 0', homo(-0));
   console.log('  特殊值 7 项 ✓');
 
-  // 3.6 展示表达式与求值表达式一致性（finisher 不破坏语义）
-  let badC = 0;
-  for (const x of [1919, 229027, 1919810, 0.25, -3.5, 5, 100, 12345]) {
-    const evE = evalStr(homo.evalStr(x).replace(/\^/g, '**')); // evalStr 不含 ^，防御
-    const ok = Number.isInteger(x) ? evE === x : relClose(evE, x);
-    if (!ok) { badC++; console.error(`  ✗ evalStr(${x}) finisher 后失真 → ${evE}`); }
+  // 3.6 展示轨（AST 美化后）语义保持：homo() 的 pretty 输出重新解析并在 AST 上求值对拍
+  //     —— finisher 是独立的解析/简化/打印管线，必须全量验证其不破坏语义
+  let badP = 0;
+  const FACT19 = [1, 1];
+  for (let i = 2; i <= 18; i++) FACT19[i] = FACT19[i - 1] * i;
+  const astEval = (n) => {
+    switch (n.t) {
+      case 'num': return Number(n.v);
+      case 'neg': return -astEval(n.x);
+      case 'fac': { const x = astEval(n.x); return FACT19[x]; }
+      case 'sqrt': return Math.sqrt(astEval(n.x));
+      case 'floor': return Math.floor(astEval(n.x));
+      case 'bin': {
+        const l = astEval(n.l), r = astEval(n.r);
+        return n.op === '+' ? l + r : n.op === '-' ? l - r : n.op === '*' ? l * r
+          : n.op === '/' ? l / r : l ** r;
+      }
+    }
+  };
+  const tokenize2 = (s) => {
+    const toks = [];
+    for (let i = 0; i < s.length;) {
+      const c = s[i];
+      if (c >= '0' && c <= '9') {
+        let j = i; while (j < s.length && s[j] >= '0' && s[j] <= '9') j++;
+        toks.push({ t: 'num', v: s.slice(i, j) }); i = j;
+      } else if ('+-*/^()!'.includes(c) || c === '√' || c === '⌊' || c === '⌋') { toks.push({ t: c }); i++; }
+      else if (c === ' ') i++;
+      else throw new Error('bad token ' + c);
+    }
+    return toks;
+  };
+  let T2, P2;
+  const pExpr = () => { let l = pTerm(); while (T2[P2] && (T2[P2].t === '+' || T2[P2].t === '-')) l = { t: 'bin', op: T2[P2++].t, l, r: pTerm() }; return l; };
+  const pTerm = () => { let l = pPow(); while (T2[P2] && (T2[P2].t === '*' || T2[P2].t === '/')) l = { t: 'bin', op: T2[P2++].t, l, r: pPow() }; return l; };
+  const pPow = () => { const b = pUnary(); if (T2[P2] && T2[P2].t === '^') { P2++; return { t: 'bin', op: '^', l: b, r: pPow() }; } return b; };
+  const pUnary = () => T2[P2] && T2[P2].t === '-' ? (P2++, { t: 'neg', x: pUnary() }) : pPost();
+  const pPost = () => { let x = pPrim(); while (T2[P2] && T2[P2].t === '!') { P2++; x = { t: 'fac', x }; } return x; };
+  const pPrim = () => {
+    const p = T2[P2];
+    if (p.t === 'num') { P2++; return { t: 'num', v: p.v }; }
+    if (p.t === '(') { P2++; const e = pExpr(); P2++; return e; }
+    if (p.t === '√') { P2++; P2++; const e = pExpr(); P2++; return { t: 'sqrt', x: e }; }
+    if (p.t === '⌊') { P2++; const e = pExpr(); P2++; return { t: 'floor', x: e }; }
+    throw new Error('unexpected ' + p.t);
+  };
+  const prettyCases = [];
+  for (let n = 0; n <= 3000; n++) prettyCases.push(n);
+  for (const x of [1919, 229027, 1919810, 123456789, 9007199254740991, 0.25, -42, 3.5, 1000000007]) prettyCases.push(x);
+  for (const x of prettyCases) {
+    const s = homo(x);
+    try {
+      T2 = tokenize2(s); P2 = 0;
+      const ast = pExpr();
+      if (P2 !== T2.length) throw new Error('trailing');
+      const got = astEval(ast);
+      const ok = Number.isInteger(x) ? got === x : Math.abs(got - x) <= 1e-9 * Math.max(1, Math.abs(x));
+      if (!ok) { badP++; if (badP <= 3) console.error(`  ✗ homo(${x}) 美化后 AST 求值 ${got}: ${s.slice(0, 90)}`); }
+    } catch (e) { badP++; if (badP <= 3) console.error(`  ✗ homo(${x}) 美化后解析失败 ${e.message}: ${s.slice(0, 90)}`); }
   }
-  check(badC === 0, 'finisher 语义保持');
-  console.log(`  finisher 语义保持: ${badC === 0 ? '✓' : badC + ' ✗'}`);
+  check(badP === 0, '展示轨美化后语义保持（AST 重解析求值）');
+  console.log(`  展示轨美化语义: ${prettyCases.length} 个全解析+求值, ${badP === 0 ? '✓' : badP + ' ✗'}`);
 }
 
 // ==================== 4. 旧表回归 ====================

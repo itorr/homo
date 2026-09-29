@@ -142,7 +142,7 @@ const homo = ((DIGITS) => {
 		{ f: uFact, wrap: (e) => `(${e})!`, vwrap: (e) => `F(${e})` },
 		{ f: uSqrt, wrap: (e) => `√(${e})`, vwrap: (e) => `SQ(${e})` },
 		{ f: uFloor, wrap: (e) => `⌊${e}⌋`, vwrap: (e) => `FL(${e})` },
-		{ f: uFloorSqrt, aux: true, wrap: (e) => `⌊√${e}⌋`, vwrap: (e) => `FLSQ(${e})` },
+		{ f: uFloorSqrt, aux: true, wrap: (e) => `⌊√(${e})⌋`, vwrap: (e) => `FLSQ(${e})` },
 	];
 
 	// 整数次幂。底限定整数：浮点 pow 对分数底走 exp/log 路径不保证精确；
@@ -445,30 +445,163 @@ const homo = ((DIGITS) => {
 	};
 
 	// ==================== §7 finisher（输出净化） ====================
+	// AST 级打印器：解析 → 恒等简化 → 按优先级上下文打印最少括号。
+	// （正则方案只能覆盖运算符单侧，左侧/嵌套/一元外层的冗余括号均无法触达。）
 	// 注：块内每个数字必须消耗，×1 类"恒等式"是子区间数字消耗的合法方式，
-	// 不能在生成端跳过；冗余仅在输出端以保语义的规则化简。
+	// 不能在生成端跳过；冗余仅在输出端化简。
+
+	const tokenize = (s) => {
+		const toks = [];
+		for (let i = 0; i < s.length;) {
+			const c = s[i];
+			if (c >= '0' && c <= '9') {
+				let j = i;
+				while (j < s.length && s[j] >= '0' && s[j] <= '9') j++;
+				toks.push({ t: 'num', v: s.slice(i, j) });
+				i = j;
+			} else if ('+-*/^()!'.includes(c) || c === '√' || c === '⌊' || c === '⌋') {
+				toks.push({ t: c });
+				i++;
+			} else if (c === ' ') i++;
+			else throw new Error('bad token: ' + c);
+		}
+		return toks;
+	};
+
+	// 递归下降解析（优先级：+ − < * / < ^（右结合）< 一元负 < 后缀 ! < √ ⌊⌋ 原子）
+	let _toks, _pos;
+	const parseExpr = () => {
+		let l = parseTerm();
+		while (_toks[_pos] && (_toks[_pos].t === '+' || _toks[_pos].t === '-'))
+			l = { t: 'bin', op: _toks[_pos++].t, l, r: parseTerm() };
+		return l;
+	};
+	const parseTerm = () => {
+		let l = parsePow();
+		while (_toks[_pos] && (_toks[_pos].t === '*' || _toks[_pos].t === '/'))
+			l = { t: 'bin', op: _toks[_pos++].t, l, r: parsePow() };
+		return l;
+	};
+	// 幂：右结合（指数递归取幂层级，可含前导负）
+	const parsePow = () => {
+		const b = parseUnary();
+		if (_toks[_pos] && _toks[_pos].t === '^') {
+			_pos++;
+			return { t: 'bin', op: '^', l: b, r: parsePow() };
+		}
+		return b;
+	};
+	const parseUnary = () =>
+		_toks[_pos] && _toks[_pos].t === '-'
+			? (_pos++, { t: 'neg', x: parseUnary() })
+			: parsePostfix();
+	const parsePostfix = () => {
+		let x = parsePrimary();
+		while (_toks[_pos] && _toks[_pos].t === '!') { _pos++; x = { t: 'fac', x }; }
+		return x;
+	};
+	const parsePrimary = () => {
+		const p = _toks[_pos];
+		if (!p) throw new Error('unexpected end');
+		if (p.t === 'num') { _pos++; return { t: 'num', v: p.v }; }
+		if (p.t === '(') {
+			_pos++;
+			const e = parseExpr();
+			if (!_toks[_pos] || _toks[_pos++].t !== ')') throw new Error('expect )');
+			return e;
+		}
+		if (p.t === '√') {
+			_pos++;
+			if (!_toks[_pos] || _toks[_pos++].t !== '(') throw new Error('expect ( after √');
+			const e = parseExpr();
+			if (!_toks[_pos] || _toks[_pos++].t !== ')') throw new Error('expect )');
+			return { t: 'sqrt', x: e };
+		}
+		if (p.t === '⌊') {
+			_pos++;
+			const e = parseExpr();
+			if (!_toks[_pos] || _toks[_pos++].t !== '⌋') throw new Error('expect ⌋');
+			return { t: 'floor', x: e };
+		}
+		throw new Error('unexpected ' + p.t);
+	};
+	const parseAst = (s) => {
+		_toks = tokenize(s); _pos = 0;
+		const ast = parseExpr();
+		if (_pos !== _toks.length) throw new Error('trailing tokens');
+		return ast;
+	};
+
+	// 恒等简化（全部为精确恒等，无浮点陷阱）
+	const simplify = (n) => {
+		if (n.t === 'bin' || n.t === 'fac' || n.t === 'sqrt' || n.t === 'floor') {
+			if (n.l) { n.l = simplify(n.l); n.r = simplify(n.r); }
+			else n.x = simplify(n.x);
+		} else if (n.t === 'neg') n.x = simplify(n.x);
+		if (n.t === 'fac') {
+			if (n.x.t === 'num' && (n.x.v === '0' || n.x.v === '1')) return { t: 'num', v: '1' };
+			return n;
+		}
+		if (n.t !== 'bin') return n;
+		const { op, l, r } = n;
+		const isNum = (x, v) => x.t === 'num' && (v === undefined || +x.v === v);
+		if (op === '*') {
+			if (isNum(l, 1)) return r;
+			if (isNum(r, 1)) return l;
+			if (isNum(l, 0) || isNum(r, 0)) return { t: 'num', v: '0' };
+		} else if (op === '+') {
+			if (isNum(l, 0)) return r;
+			if (isNum(r, 0)) return l;
+		} else if (op === '-') {
+			if (isNum(r, 0)) return l;
+		} else if (op === '/') {
+			if (isNum(r, 1)) return l;
+		} else if (op === '^') {
+			if (isNum(r, 1)) return l;
+			if (isNum(r, 0)) return { t: 'num', v: '1' };
+			if (isNum(l, 1)) return { t: 'num', v: '1' };
+		}
+		return n;
+	};
+
+	// 优先级：+ − = 1，* / = 2，一元负 = 0.5（非加法左操作数位置一律加括号），
+	// ^ = 3，! / √ / ⌊⌋ / 数字 = 4（原子）
+	const pr = (n) =>
+		n.t === 'bin' ? (n.op === '+' || n.op === '-' ? 1 : n.op === '^' ? 3 : 2)
+		: n.t === 'neg' ? 0.5
+		: 4;
+
+	const print = (n) => {
+		switch (n.t) {
+			case 'num': return n.v;
+			// 一元负：操作数原子则裸，否则括号；作父操作数时的隔离由父节点决定
+			case 'neg': return '-' + (pr(n.x) === 4 ? print(n.x) : `(${print(n.x)})`);
+			case 'fac':
+				return (n.x.t === 'num' || n.x.t === 'fac' ? print(n.x) : `(${print(n.x)})`) + '!';
+			case 'sqrt': return `√(${print(n.x)})`;
+			case 'floor': return `⌊${print(n.x)}⌋`;
+			case 'bin': {
+				// 左结合（^ 右结合）：左裸需 pr ≥ 父（^ 严格大于），右裸需 pr > 父（^ ≥）
+				const p = pr(n);
+				const needL = n.op === '^' ? pr(n.l) <= p : pr(n.l) < p;
+				const needR = n.op === '^' ? pr(n.r) < p : pr(n.r) <= p;
+				// neg 作左操作数：分配律下 + − * / 均值同，仅 ^ 底必须括号；
+				// 作右操作数：恒括号（防 a--b，且 a+-b / a*-b 难读）
+				const lParen = n.l.t === 'neg' ? n.op === '^' : needL;
+				const rParen = n.r.t === 'neg' ? true : needR;
+				return (lParen ? `(${print(n.l)})` : print(n.l))
+					+ n.op
+					+ (rParen ? `(${print(n.r)})` : print(n.r));
+			}
+		}
+	};
 
 	const finisher = (expr) => {
-		let prev = null;
-		while (prev !== expr) {
-			prev = expr;
-			expr = expr
-				// 恒等元消除：(X)*(1) / (1)*(X) → X（乘 1）；(X)+(0)/(0)+(X)/(X)-(0) → X
-				.replace(/\(1\)\*(?=[^(])/g, '')
-				.replace(/\*\(1\)(?![\d(])/g, '')
-				.replace(/\(0\)\+/g, '')
-				.replace(/\+\(0\)(?![\d(])/g, '')
-				.replace(/\-\(0\)(?![\d(])/g, '')
-				// (X)^(1) → X
-				.replace(/\^\(1\)(?![\d(])/g, '')
-				// 乘除法操作数的纯乘除括号剥离
-				.replace(/([\*\/])\(([^\+\-\(\)]+)\)/g, '$1$2')
-				// 加减法操作数的无括号剥离
-				.replace(/([\+\-])\(([^\(\)]+)\)(?=[\+\-\)]|$)/g, '$1$2')
-				// 最外层括号剥离
-				.replace(/^\(([^\(\)]+)\)$/, '$1');
+		try {
+			return print(simplify(parseAst(expr)));
+		} catch (_) {
+			return expr; // 解析失败原样返回（eval 轨语义不受影响）
 		}
-		return expr.replace(/\+-/g, '-');
 	};
 
 	// ==================== §8 组装 ====================
@@ -505,13 +638,13 @@ const homo = ((DIGITS) => {
 		const r = core(num);
 		if (!r) return '';
 		if (r.special) return r.special;
-		return finisher(r.e);
+		return finisher(r.e); // 展示轨：AST 解析 + 恒等简化 + 优先级打印
 	};
 	main.evalStr = (num) => {
 		const r = core(num);
 		if (!r) return '';
 		if (r.special) return r.special;
-		return finisher(r.v);
+		return r.v; // 求值轨：生成端模板自带括号，原样返回（函数调用式，AST 打印器不适用）
 	};
 	main.ready = () => ready;
 	main.onUpgrade = null;
